@@ -1,53 +1,81 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session
+from flask_session import Session
 
 app = Flask(__name__)
+app.secret_key = "demo_secret"
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
+# Fake accounts
 accounts = {
-    "jabelo": {
-        "balance": 500.00,
-        "transactions": []
-    }
+    "jabelo": {"balance": 500.00, "transactions": []},
+    "thabo": {"balance": 300.00, "transactions": []}
 }
 
-current_user = "jabelo"
+# Login page
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        if username in accounts:
+            session['user'] = username
+            return redirect(url_for('dashboard'))
+        return "User not found", 404
+    return render_template('login.html')
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Dashboard
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', username=session['user'])
 
+# API endpoints
 @app.route('/balance', methods=['GET'])
 def get_balance():
-    return jsonify({"balance": accounts[current_user]["balance"]})
+    user = session.get('user')
+    return jsonify({"balance": accounts[user]["balance"]})
 
 @app.route('/send', methods=['POST'])
 def send_money():
+    user = session.get('user')
     data = request.json
-    amount = float(data.get("amount", 0))
-    recipient = data.get("recipient", "Unknown")
-    if amount <= 0:
-        return jsonify({"error": "Invalid amount"}), 400
-    if accounts[current_user]["balance"] < amount:
-        return jsonify({"error": "Insufficient funds"}), 400
-    accounts[current_user]["balance"] -= amount
-    accounts[current_user]["transactions"].append({"type": "send", "recipient": recipient, "amount": amount})
-    return jsonify({"message": f"Sent R{amount:.2f} to {recipient}", "balance": accounts[current_user]["balance"]})
+    recipient = data.get('recipient')
+    amount = float(data.get('amount', 0))
+
+    if recipient not in accounts: return jsonify({"error":"Recipient not found"}), 404
+    if amount <= 0: return jsonify({"error":"Invalid amount"}), 400
+    if accounts[user]["balance"] < amount: return jsonify({"error":"Insufficient funds"}), 400
+
+    accounts[user]["balance"] -= amount
+    accounts[recipient]["balance"] += amount
+    accounts[user]["transactions"].append({"type":"send", "recipient":recipient, "amount":amount})
+    return jsonify({"message": f"Sent R{amount:.2f} to {recipient}", "balance": accounts[user]["balance"]})
 
 @app.route('/pay', methods=['POST'])
 def pay_bill():
+    user = session.get('user')
     data = request.json
-    amount = float(data.get("amount", 0))
-    bill_name = data.get("bill_name", "Unknown")
-    if amount <= 0:
-        return jsonify({"error": "Invalid amount"}), 400
-    if accounts[current_user]["balance"] < amount:
-        return jsonify({"error": "Insufficient funds"}), 400
-    accounts[current_user]["balance"] -= amount
-    accounts[current_user]["transactions"].append({"type": "bill", "bill_name": bill_name, "amount": amount})
-    return jsonify({"message": f"Paid {bill_name} bill of R{amount:.2f}", "balance": accounts[current_user]["balance"]})
+    bill = data.get('bill_name')
+    amount = float(data.get('amount',0))
+
+    if amount <=0: return jsonify({"error":"Invalid amount"}), 400
+    if accounts[user]["balance"] < amount: return jsonify({"error":"Insufficient funds"}), 400
+
+    accounts[user]["balance"] -= amount
+    accounts[user]["transactions"].append({"type":"bill","bill_name":bill,"amount":amount})
+    return jsonify({"message": f"Paid {bill} bill of R{amount:.2f}","balance": accounts[user]["balance"]})
 
 @app.route('/transactions', methods=['GET'])
 def transactions():
-    return jsonify(accounts[current_user]["transactions"])
+    user = session.get('user')
+    return jsonify(accounts[user]["transactions"])
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
