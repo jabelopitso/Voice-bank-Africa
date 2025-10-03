@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VoiceBank Africa Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>VoiceBank Africa</h1>
+        <p>Welcome, Jabelo!</p>
+        <button onclick="checkBalance()">Check Balance</button>
+        <button onclick="sendMoney()">Send Money</button>
+        <button onclick="payBill()">Pay Bill</button>
+        <button onclick="viewTransactions()">Transaction History</button>
+        <button onclick="startListening()">🎤 Voice Command</button>
+        <div id="output"></div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
