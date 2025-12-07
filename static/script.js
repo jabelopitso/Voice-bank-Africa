@@ -4,11 +4,17 @@ function speak(text){
     console.log(text);
 }
 
+window.onload = function(){
+    checkBalance();
+    viewTransactions();
+};
+
 // Update balance on page
 function checkBalance(){
     fetch('/balance').then(res=>res.json()).then(data=>{
         document.getElementById('balance').innerText = `R${data.balance.toFixed(2)}`;
-        speak(`Your balance is ${data.balance} Rand`);
+    }).catch(err=>{
+        document.getElementById('balance').innerText = 'Error loading balance';
     });
 }
 
@@ -48,11 +54,11 @@ function payBill(){
 function viewTransactions(){
     fetch('/transactions').then(res=>res.json()).then(data=>{
         const div = document.getElementById('transactions');
-        if(data.length===0){ div.innerText="No transactions yet."; speak("No transactions yet."); return; }
+        if(data.length===0){ div.innerText="No transactions yet."; return; }
         let html="";
         data.forEach(t=>{
-            if(t.type==="send") html+=`Sent R${t.amount} to ${t.recipient}\n`;
-            if(t.type==="bill") html+=`Paid ${t.bill_name} bill R${t.amount}\n`;
+            if(t.type==="send") html+=`✓ Sent R${t.amount.toFixed(2)} to ${t.recipient}\n`;
+            if(t.type==="bill") html+=`✓ Paid ${t.bill_name} bill R${t.amount.toFixed(2)}\n`;
         });
         div.innerText = html;
         speak("Here are your recent transactions.");

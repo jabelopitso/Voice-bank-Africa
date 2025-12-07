@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - VoiceBank Africa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 VoiceBank Africa</h1>
+        <h2>Create New Account</h2>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <input type="text" name="username" placeholder="Choose a username" required>
+            <input type="password" name="password" placeholder="Choose a password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <p class="link-text">Already have an account? <a href="/">Login</a></p>
+        <p class="info-text">💰 New accounts start with R1000.00 balance!</p>
+    </div>
+</body>
+</html>

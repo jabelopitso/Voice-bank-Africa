@@ -1,0 +1,23 @@
+{
+  "jabelo": {
+    "password": "1234",
+    "balance": 800.0,
+    "transactions": []
+  },
+  "thabo": {
+    "password": "1234",
+    "balance": 300.0,
+    "transactions": []
+  },
+  "jay": {
+    "password": "1234567",
+    "balance": 700.0,
+    "transactions": [
+      {
+        "type": "send",
+        "recipient": "jabelo",
+        "amount": 300.0
+      }
+    ]
+  }
+}

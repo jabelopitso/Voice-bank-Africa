@@ -1,3 +1,21 @@
-body { font-family: Arial; text-align: center; padding: 50px; background-color: #e6f0ff; }
-button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
-#output { margin-top: 20px; font-weight: bold; font-size: 18px; white-space: pre-line; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+.container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 600px; width: 90%; }
+h1 { color: #667eea; margin-bottom: 20px; }
+h2 { color: #333; margin-bottom: 15px; font-size: 20px; }
+p { color: #666; margin: 10px 0; }
+.card { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 10px; border-left: 4px solid #667eea; }
+#balance { font-size: 32px; font-weight: bold; color: #28a745; margin: 15px 0; }
+#transactions { text-align: left; white-space: pre-line; color: #333; max-height: 200px; overflow-y: auto; }
+input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 5px; font-size: 16px; }
+input[type="text"]:focus { outline: none; border-color: #667eea; }
+button { background: #667eea; color: white; border: none; padding: 12px 24px; margin: 5px; border-radius: 5px; font-size: 16px; cursor: pointer; transition: all 0.3s; }
+button:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.3); }
+button:active { transform: translateY(0); }
+.actions { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+a { text-decoration: none; color: #667eea; font-weight: bold; }
+a:hover { text-decoration: underline; }
+.error { background: #ff4444; color: white; padding: 12px; border-radius: 5px; margin: 15px 0; }
+.link-text { margin: 20px 0 10px 0; font-size: 14px; }
+.demo-text { font-size: 13px; color: #888; margin-top: 5px; }
+.info-text { font-size: 14px; color: #28a745; margin-top: 15px; font-weight: bold; }

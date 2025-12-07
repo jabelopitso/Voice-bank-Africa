@@ -1,27 +1,62 @@
 from flask import Flask, jsonify, request, render_template, redirect, url_for, session
-from flask_session import Session
+import json
+import os
 
 app = Flask(__name__)
-app.secret_key = "demo_secret"
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
+app.secret_key = "demo_secret_voicebank_africa_2024"
 
-# Fake accounts
-accounts = {
-    "jabelo": {"balance": 500.00, "transactions": []},
-    "thabo": {"balance": 300.00, "transactions": []}
-}
+# Load/Save accounts
+ACCOUNTS_FILE = 'data/accounts.json'
+
+def load_accounts():
+    if os.path.exists(ACCOUNTS_FILE) and os.path.getsize(ACCOUNTS_FILE) > 0:
+        with open(ACCOUNTS_FILE, 'r') as f:
+            return json.load(f)
+    return {
+        "jabelo": {"password": "1234", "balance": 500.00, "transactions": []},
+        "thabo": {"password": "1234", "balance": 300.00, "transactions": []}
+    }
+
+def save_accounts():
+    with open(ACCOUNTS_FILE, 'w') as f:
+        json.dump(accounts, f, indent=2)
+
+accounts = load_accounts()
 
 # Login page
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
-        if username in accounts:
+        password = request.form.get('password')
+        if username in accounts and accounts[username].get('password') == password:
             session['user'] = username
             return redirect(url_for('dashboard'))
-        return "User not found", 404
+        return render_template('login.html', error="Invalid username or password")
     return render_template('login.html')
+
+# Signup page
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            return render_template('signup.html', error="Username and password required")
+        
+        if username in accounts:
+            return render_template('signup.html', error="Username already exists")
+        
+        accounts[username] = {
+            "password": password,
+            "balance": 1000.00,
+            "transactions": []
+        }
+        save_accounts()
+        session['user'] = username
+        return redirect(url_for('dashboard'))
+    return render_template('signup.html')
 
 # Dashboard
 @app.route('/dashboard')
@@ -50,6 +85,7 @@ def send_money():
     accounts[user]["balance"] -= amount
     accounts[recipient]["balance"] += amount
     accounts[user]["transactions"].append({"type":"send", "recipient":recipient, "amount":amount})
+    save_accounts()
     return jsonify({"message": f"Sent R{amount:.2f} to {recipient}", "balance": accounts[user]["balance"]})
 
 @app.route('/pay', methods=['POST'])
@@ -64,6 +100,7 @@ def pay_bill():
 
     accounts[user]["balance"] -= amount
     accounts[user]["transactions"].append({"type":"bill","bill_name":bill,"amount":amount})
+    save_accounts()
     return jsonify({"message": f"Paid {bill} bill of R{amount:.2f}","balance": accounts[user]["balance"]})
 
 @app.route('/transactions', methods=['GET'])

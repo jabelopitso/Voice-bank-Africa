@@ -7,12 +7,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Login to VoiceBank Africa</h1>
+        <h1>🏦 VoiceBank Africa</h1>
+        <h2>Login to Your Account</h2>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
         <form method="POST">
-            <input type="text" name="username" placeholder="Enter username" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
-        <p>Try users: <b>jabelo</b> or <b>thabo</b></p>
+        <p class="link-text">Don't have an account? <a href="/signup">Sign Up</a></p>
+        <p class="demo-text">Demo users: <b>jabelo</b> or <b>thabo</b> (password: 1234)</p>
     </div>
 </body>
 </html>
